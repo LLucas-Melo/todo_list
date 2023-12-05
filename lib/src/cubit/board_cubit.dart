@@ -21,57 +21,49 @@ class BoardCubit extends Cubit<BoardState> {
   }
 
   Future<void> addTask(Task newTask) async {
-    final state = this.state;
-    if (state is! GettedTaskBoardState) {
-      return;
-    }
-
-    final tasks = state.tasks.toList();
+    final tasks = _getTask();
+    if (tasks == null) return;
     tasks.add(newTask);
 
-    try {
-      // Certifique-se de que o método update seja assíncrono se estiver utilizando await
-      await repository.update(tasks);
-      emit(GettedTaskBoardState(tasks: tasks));
-    } catch (e) {
-      emit(FailBoardState(menssagem: 'error'));
-    }
+    await emiteTasks(tasks);
   }
 
   Future<void> removeTask(Task newTask) async {
-    final state = this.state;
-    if (state is! GettedTaskBoardState) {
-      return;
-    }
-    final tasks = state.tasks.toList();
+    final tasks = _getTask();
+    if (tasks == null) return;
     tasks.remove(newTask);
-    try {
-      await repository.update(tasks);
-      emit(GettedTaskBoardState(tasks: tasks));
-    } catch (e) {
-      emit(FailBoardState(menssagem: 'error'));
-    }
+    await emiteTasks(tasks);
   }
 
   Future<void> checkTask(Task newTask) async {
-    final state = this.state;
-    if (state is! GettedTaskBoardState) {
-      return;
-    }
-    final tasks = state.tasks.toList();
+    final tasks = _getTask();
+    if (tasks == null) return;
     final index = tasks.indexOf(newTask);
     tasks[index] = newTask.copyWith(check: !newTask.check);
 
-    try {
-      await repository.update(tasks);
-      emit(GettedTaskBoardState(tasks: tasks));
-    } catch (e) {
-      emit(FailBoardState(menssagem: 'error'));
-    }
+    await emiteTasks(tasks);
   }
 
   @visibleForTesting
   void addTasks(List<Task> tasks) {
     emit(GettedTaskBoardState(tasks: tasks));
+  }
+
+  List<Task>? _getTask() {
+    final state = this.state;
+    if (state is! GettedTaskBoardState) {
+      return null;
+    }
+    return state.tasks.toList();
+  }
+
+  Future<void> emiteTasks(List<Task> tasks) async {
+    try {
+      await repository.update(
+          tasks); // Certifique-se de que o método update seja assíncrono se estiver utilizando await
+      emit(GettedTaskBoardState(tasks: tasks));
+    } catch (e) {
+      emit(FailBoardState(menssagem: 'error'));
+    }
   }
 }
