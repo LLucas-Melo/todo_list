@@ -10,7 +10,7 @@ class BoardCubit extends Cubit<BoardState> {
   final BoardRepository repository;
   BoardCubit(this.repository) : super(EmptyBoardState());
 
-  Future<void> fetchTask() async {
+  Future<void> fetchTasks() async {
     emit(LoadingBoardState());
     try {
       final tasks = await repository.fetch();

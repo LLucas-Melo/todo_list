@@ -29,7 +29,7 @@ void main() {
           isA<GettedTaskBoardState>(),
         ]),
       );
-      await cubit.fetchTask();
+      await cubit.fetchTasks();
     });
 
     test('should return an error', () async {
@@ -44,7 +44,7 @@ void main() {
           ],
         ),
       );
-      await cubit.fetchTask();
+      await cubit.fetchTasks();
     });
   });
 
